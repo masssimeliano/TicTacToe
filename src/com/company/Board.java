@@ -8,8 +8,8 @@ import java.io.IOException;
 
 public class Board extends JComponent {
 
-    private final int widthField = 600;
-    private final int heightField = 600;
+    private final int widthField = 300;
+    private final int heightField = 300;
 
     private final int widthCell = widthField / 3;
     private final int heightCell = heightField / 3;
@@ -23,6 +23,8 @@ public class Board extends JComponent {
 
     private boolean flagWin = false;
 
+    private boolean XTurn = false;
+
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
 
@@ -34,9 +36,11 @@ public class Board extends JComponent {
 
         endGameCheck(graphics);
 
+        drawWinnerScreen(graphics);
         drawField(graphics);
         drawIcon(graphics);
-        drawCursor(graphics);
+        if (flagWin == false)
+            drawCursor(graphics);
         drawCells(graphics);
     }
 
@@ -52,6 +56,7 @@ public class Board extends JComponent {
         x = 1;
         y = 1;
 
+        XTurn = false;
         flagWin = false;
     }
 
@@ -61,9 +66,9 @@ public class Board extends JComponent {
         graphics2D.setColor(Color.BLACK);
 
         for (int i = 0; i <= 2; i++) {
-            graphics2D.drawRect(0 + i, 0 + i, widthField - 2 * i, heightField - 2 * i);
-            graphics2D.drawRect(0 + i, heightCell + i, widthField - 2 * i, heightCell - 2 * i);
-            graphics2D.drawRect(widthCell + i, 0 + i, widthCell - 2 * i, heightField - 2 * i);
+            graphics2D.drawRect(90 + i + widthCell / 2, 200 + i + heightCell / 2, widthField - 2 * i, heightField - 2 * i);
+            graphics2D.drawRect(90 + i + widthCell / 2, heightCell + i + 200 + heightCell / 2, widthField - 2 * i, heightCell - 2 * i);
+            graphics2D.drawRect(90 + widthCell / 2 + widthCell + i, 200 + i + heightCell / 2, widthCell - 2 * i, heightField - 2 * i);
         }
     }
 
@@ -72,15 +77,15 @@ public class Board extends JComponent {
 
         graphics2D.setColor(Color.ORANGE);
 
-        graphics2D.drawRect(x * widthCell, y * widthCell, widthCell, heightCell);
-        graphics2D.drawRect(x * widthCell + 1, y * widthCell + 1, widthCell - 2, heightCell - 2);
-        graphics2D.drawRect(x * widthCell + 2, y * widthCell + 2, widthCell - 4, heightCell - 4);
+        graphics2D.drawRect(90 +  widthCell / 2 + x * widthCell, y * widthCell + 200 + heightCell / 2, widthCell, heightCell);
+        graphics2D.drawRect(90 +  widthCell / 2 + x * widthCell + 1, y * widthCell + 1 + 200 + heightCell / 2, widthCell - 2, heightCell - 2);
+        graphics2D.drawRect(90 +  widthCell / 2 + x * widthCell + 2, y * widthCell + 2 + 200 + heightCell / 2, widthCell - 4, heightCell - 4);
     }
 
     public void formCursor(int x, int y) {
         for (int i = 0; i <= 2; i++)
             for (int j = 0; j <= 2; j++) {
-                if ((x >= i * widthCell + 8) && (x <= (i + 1) * widthCell + 8) && (y >= j * heightCell + 30) && (y <= (j + 1) * heightCell + 30)) {
+                if ((x >= i * widthCell + 8 + 90 +  widthCell / 2) && (x <= (i + 1) * widthCell + 8 + 90 +  widthCell / 2) && (y >= j * heightCell + 30 +  + 200 + heightCell / 2) && (y <= (j + 1) * heightCell + 30 +  + 200 + heightCell / 2)) {
                     if (cells[i][j] == 0) {
                         this.x = i;
                         this.y = j;
@@ -100,8 +105,8 @@ public class Board extends JComponent {
                     graphics2D.setPaint(Color.RED);
 
                     for (int l = -1; l<= 1; l++) {
-                        graphics2D.drawLine(i * widthCell + l, j * heightCell, (i + 1) * widthCell + l, (j + 1) * heightCell);
-                        graphics2D.drawLine((i + 1) * widthCell + l, j * heightCell, i * widthCell + l, (j + 1) * heightCell);
+                        graphics2D.drawLine(90 +  widthCell / 2 + i * widthCell + l, j * heightCell + 200 + heightCell / 2, 90 +  widthCell / 2 + (i + 1) * widthCell + l, (j + 1) * heightCell + 200 + heightCell / 2);
+                        graphics2D.drawLine(90 +  widthCell / 2 + (i + 1) * widthCell + l, j * heightCell + 200 + heightCell / 2, 90 +  widthCell / 2 + i * widthCell + l, (j + 1) * heightCell + 200 + heightCell / 2);
                     }
                 }
 
@@ -109,7 +114,7 @@ public class Board extends JComponent {
                     graphics2D.setPaint(Color.BLUE);
 
                     for (int l = 0; l <= 2; l++)
-                        graphics2D.drawOval(i * widthCell + l, j * heightCell + l, widthCell - 2 * l, heightCell - 2 * l);
+                        graphics2D.drawOval(90 +  widthCell / 2 + i * widthCell + l, j * heightCell + l + 200 + heightCell / 2, widthCell - 2 * l, heightCell - 2 * l);
                 }
             }
     }
@@ -134,9 +139,9 @@ public class Board extends JComponent {
 
         graphics2D.setPaint(Color.ORANGE);
 
-        graphics2D.fillRect(x1 * widthCell, y1 * widthCell, widthCell, heightCell);
-        graphics2D.fillRect(x2 * widthCell, y2 * widthCell, widthCell, heightCell);
-        graphics2D.fillRect(x3 * widthCell, y3 * widthCell, widthCell, heightCell);
+        graphics2D.fillRect(90 +  widthCell / 2 + x1 * widthCell, y1 * widthCell + 200 + heightCell / 2, widthCell, heightCell);
+        graphics2D.fillRect(90 +  widthCell / 2 + x2 * widthCell, y2 * widthCell + 200 + heightCell / 2, widthCell, heightCell);
+        graphics2D.fillRect(90 +  widthCell / 2 + x3 * widthCell, y3 * widthCell + 200 + heightCell / 2, widthCell, heightCell);
     }
 
     private void drawHintTable(Graphics graphics) {
@@ -158,6 +163,46 @@ public class Board extends JComponent {
         graphics2D.drawString("P.S. You may play with your friend! :)", 0, 740);
     }
 
+    private void drawWinnerScreen(Graphics graphics) {
+        Graphics2D graphics2D = (Graphics2D) graphics;
+
+        graphics2D.setPaint(Color.GRAY);
+        graphics.fillRect(0, 0, 600, 200);
+
+        graphics2D.setPaint(Color.BLACK);
+        graphics2D.setFont(new Font("Arial", Font.BOLD, 60));
+
+        if (flagWin == true)
+        {
+            if (XTurn == true) {
+                graphics2D.setPaint(Color.RED);
+                graphics2D.drawString("X-Player Won!", 100, 100);
+            }
+            else {
+                graphics2D.setPaint(Color.BLUE);
+                graphics2D.drawString("O-Player Won!", 100, 100);
+            }
+        }
+        else {
+            if (fullCellsCount != 9) {
+                if (XTurn == true) {
+                    graphics2D.setPaint(Color.BLUE);
+                    graphics2D.drawString("O-Player", 100, 100);
+                }
+                else {
+                    graphics2D.setPaint(Color.RED);
+                    graphics2D.drawString("X-Player", 100, 100);
+                }
+
+                graphics2D.setPaint(Color.BLACK);
+                graphics2D.drawString("Turn", 350, 100);
+            }
+            else
+                graphics2D.drawString("A draw!", 190, 100);
+        }
+
+    }
+
     public boolean formCell(boolean XTurn) {
         boolean successfullyFormed = true;
 
@@ -168,6 +213,8 @@ public class Board extends JComponent {
                 cells[x][y] = 2;
 
             fullCellsCount = fullCellsCount + 1;
+
+            this.XTurn = XTurn;
 
             repaint();
         }
