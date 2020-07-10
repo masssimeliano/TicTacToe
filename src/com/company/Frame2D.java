@@ -1,11 +1,8 @@
 package com.company;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import javax.swing.JFrame;
+import java.awt.event.*;
+import javax.swing.*;
 
 
 public class Frame2D extends JFrame implements KeyListener, MouseListener {
@@ -18,12 +15,10 @@ public class Frame2D extends JFrame implements KeyListener, MouseListener {
         Frame2D jFrame2D = new Frame2D();
 
         jFrame2D.setTitle("TicTacToe");
-        jFrame2D.setMinimumSize(new Dimension(608, 640));
-        jFrame2D.setMaximumSize(new Dimension(608, 640));
+        jFrame2D.setMinimumSize(new Dimension(608, 790));
+        jFrame2D.setMaximumSize(new Dimension(608, 790));
         jFrame2D.setResizable(false);
         jFrame2D.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        jFrame2D.board.setFrame(getFrames()[0]);
 
         jFrame2D.getContentPane().add(jFrame2D.board);
 
@@ -33,6 +28,7 @@ public class Frame2D extends JFrame implements KeyListener, MouseListener {
 
     public Frame2D() {
         this.board = new Board();
+        this.board.setFreeCells();
 
         addMouseListener(this);
         addKeyListener(this);
@@ -44,12 +40,16 @@ public class Frame2D extends JFrame implements KeyListener, MouseListener {
 
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
-        int x = mouseEvent.getX();
-        int y = mouseEvent.getY();
+        if (board.isFlagWin() == false) {
+            int x = mouseEvent.getX();
+            int y = mouseEvent.getY();
 
-        board.formCursor(x, y);
+            board.formCursor(x, y);
 
-        System.out.println("Coordinates : (" + x + ", " + y + ")");
+            System.out.println("Coordinates : (" + x + ", " + y + ")");
+        }
+        else
+            System.out.println("Fixed Victory");
     }
 
     @Override
@@ -70,13 +70,26 @@ public class Frame2D extends JFrame implements KeyListener, MouseListener {
 
     @Override
     public void keyPressed(KeyEvent keyEvent) {
-        if (keyEvent.getKeyCode() == KeyEvent.VK_ENTER)
-        {
-            if (board.formCell(XTurn) == true) {
-                XTurn = !XTurn;
-            }
+        switch (keyEvent.getKeyCode()) {
+            case KeyEvent.VK_ENTER :
+                if (board.formCell(XTurn) == true) {
+                    XTurn = !XTurn;
+                }
 
-            System.out.println("Pressed : Enter");
+                System.out.println("Pressed : Enter");
+
+                break;
+
+            case KeyEvent.VK_F5 :
+                XTurn = true;
+
+                board.setFreeCells();
+
+                repaint();
+
+                System.out.println("Pressed : F5");
+
+                break;
         }
     }
 

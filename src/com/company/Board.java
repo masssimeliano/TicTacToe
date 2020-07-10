@@ -1,13 +1,12 @@
 package com.company;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.util.concurrent.TimeUnit;
+import java.io.File;
+import java.io.IOException;
 
 public class Board extends JComponent {
-
-    private Frame frame = new Frame();
 
     private final int widthField = 600;
     private final int heightField = 600;
@@ -18,9 +17,11 @@ public class Board extends JComponent {
     private int x = 1;
     private int y = 1;
 
+    private int[][] cells = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+
     private int fullCellsCount = 0;
 
-    private int[][] cells = {{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+    private boolean flagWin = false;
 
     public void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
@@ -29,15 +30,29 @@ public class Board extends JComponent {
 
         vivField();
 
+        drawHintTable(graphics);
+
         endGameCheck(graphics);
 
         drawField(graphics);
+        drawIcon(graphics);
         drawCursor(graphics);
         drawCells(graphics);
     }
 
-    public void setFrame(Frame frame) {
-        this.frame = frame;
+    public boolean isFlagWin() {
+        return flagWin;
+    }
+
+    public void setFreeCells() {
+        cells = new int[][]{{0, 0, 0}, {0, 0, 0}, {0, 0, 0}};
+
+        fullCellsCount = 0;
+
+        x = 1;
+        y = 1;
+
+        flagWin = false;
     }
 
     private void drawField(Graphics graphics) {
@@ -45,9 +60,11 @@ public class Board extends JComponent {
 
         graphics2D.setColor(Color.BLACK);
 
-        graphics2D.drawRect(0, 0, widthField, heightField);
-        graphics2D.drawRect(0, heightCell, widthField, heightCell);
-        graphics2D.drawRect(widthCell, 0, widthCell, heightField);
+        for (int i = 0; i <= 2; i++) {
+            graphics2D.drawRect(0 + i, 0 + i, widthField - 2 * i, heightField - 2 * i);
+            graphics2D.drawRect(0 + i, heightCell + i, widthField - 2 * i, heightCell - 2 * i);
+            graphics2D.drawRect(widthCell + i, 0 + i, widthCell - 2 * i, heightField - 2 * i);
+        }
     }
 
     private void drawCursor(Graphics graphics) {
@@ -56,6 +73,8 @@ public class Board extends JComponent {
         graphics2D.setColor(Color.ORANGE);
 
         graphics2D.drawRect(x * widthCell, y * widthCell, widthCell, heightCell);
+        graphics2D.drawRect(x * widthCell + 1, y * widthCell + 1, widthCell - 2, heightCell - 2);
+        graphics2D.drawRect(x * widthCell + 2, y * widthCell + 2, widthCell - 4, heightCell - 4);
     }
 
     public void formCursor(int x, int y) {
@@ -80,16 +99,34 @@ public class Board extends JComponent {
                 if (cells[i][j] == 1) {
                     graphics2D.setPaint(Color.RED);
 
-                    graphics2D.drawLine(i * widthCell, j * heightCell, (i + 1) * widthCell, (j + 1) * heightCell);
-                    graphics2D.drawLine((i + 1) * widthCell, j * heightCell, i * widthCell, (j + 1) * heightCell);
+                    for (int l = -1; l<= 1; l++) {
+                        graphics2D.drawLine(i * widthCell + l, j * heightCell, (i + 1) * widthCell + l, (j + 1) * heightCell);
+                        graphics2D.drawLine((i + 1) * widthCell + l, j * heightCell, i * widthCell + l, (j + 1) * heightCell);
+                    }
                 }
 
                 if (cells[i][j] == 2) {
                     graphics2D.setPaint(Color.BLUE);
 
-                    graphics2D.drawOval(i * widthCell, j * heightCell, widthCell, heightCell);
+                    for (int l = 0; l <= 2; l++)
+                        graphics2D.drawOval(i * widthCell + l, j * heightCell + l, widthCell - 2 * l, heightCell - 2 * l);
                 }
             }
+    }
+
+    private void drawIcon(Graphics graphics) {
+        Graphics2D graphics2D = (Graphics2D) graphics;
+
+        Image image = null;
+
+        try {
+            image = ImageIO.read(new File("C:\\Users\\Admin\\IdeaProjects\\TicTacToeGame\\src\\resources\\icon.png"));
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        graphics2D.drawImage(image, 450, 613, 125, 125, null);
     }
 
     private void drawWin(Graphics graphics, int x1, int y1, int x2, int y2, int x3, int y3) {
@@ -100,6 +137,25 @@ public class Board extends JComponent {
         graphics2D.fillRect(x1 * widthCell, y1 * widthCell, widthCell, heightCell);
         graphics2D.fillRect(x2 * widthCell, y2 * widthCell, widthCell, heightCell);
         graphics2D.fillRect(x3 * widthCell, y3 * widthCell, widthCell, heightCell);
+    }
+
+    private void drawHintTable(Graphics graphics) {
+        Graphics2D graphics2D = (Graphics2D) graphics;
+
+        graphics2D.setPaint(Color.GRAY);
+        graphics.fillRect(0, 600, 600, 200);
+
+        graphics2D.setPaint(Color.BLACK);
+        graphics2D.setFont(new Font("Arial", Font.BOLD, 20));
+
+        graphics2D.drawString("Instruction : ", 0, 620);
+        graphics2D.drawString(" - Use Mouse to choose cell", 0, 650);
+        graphics2D.drawString(" - Use Enter to place an X/O", 0, 680);
+        graphics2D.drawString(" - Use F5 to restart game", 0, 710);
+
+        graphics2D.setFont(new Font("Arial", Font.BOLD + Font.CENTER_BASELINE, 20));
+
+        graphics2D.drawString("P.S. You may play with your friend! :)", 0, 740);
     }
 
     public boolean formCell(boolean XTurn) {
@@ -122,7 +178,6 @@ public class Board extends JComponent {
     }
 
     private String checkWin(Graphics graphics) {
-
         for (int i = 0; i <= 2; i++)
         {
             for (int j = 1; j <= 2; j++) {
@@ -169,6 +224,8 @@ public class Board extends JComponent {
     }
 
     private void vivField() {
+        System.out.println("Field :");
+
         for (int i = 0; i <= 2; i++)
             System.out.println(cells[0][i] + " " + cells[1][i] + " " + cells[2][i]);
     }
@@ -177,29 +234,24 @@ public class Board extends JComponent {
         if (fullCellsCount >= 5) {
             String result = checkWin(graphics);
 
+            flagWin = true;
+
             if (result.equals("X") == true) {
                 System.out.println("Check : X Won!");
 
                 drawCells(graphics);
-
-                frame.disable();
-
-                System.out.println("Frame is disabled");
-                // frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
             }
             else
                 if (result.equals("O") == true) {
                     System.out.println("Check : O Won!");
 
                     drawCells(graphics);
-
-                    frame.disable();
-
-                    System.out.println("Frame is disabled");
-                    // frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
                 }
-                else
+                else {
                     System.out.println("Check : No One Won!");
+
+                    flagWin = false;
+                }
         }
     }
 
